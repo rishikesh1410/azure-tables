@@ -312,7 +312,7 @@ function retrieveColumnsDataHelper(tableQuery, continuationToken, callback) {
 
     continuationToken = result.continuationToken;
     segments++;
-    if (continuationToken && segments<1) {
+    if (continuationToken && segments<noofsegments) {
       retrieveColumnsDataHelper(tableQuery, continuationToken, callback);
     } else {
       console.log("Query completed.");
