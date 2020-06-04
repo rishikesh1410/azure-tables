@@ -19,6 +19,7 @@ var config;
 var data = [];
 var tableName = "chatlog";
 var segments = 0;
+var noofsegments=1;
 var col1,col2;
 var segmentSize = 20;
 
@@ -44,9 +45,15 @@ app.get('/', (req,res)=>{
 
 app.get('/account/:id', (req,res)=>{
     config = connect(users[req.params.id].connectionString);
+    nrows=20;
     if(req.params.id == 2) tableName="chatlogqa";
     else tableName="chatlog";
-    retrieveAllEntities(res,req.params.id);
+
+    if(req.query.noofrows != undefined) {
+      noofsegments=req.query.noofrows/segmentSize;
+      nrows=req.query.noofrows;
+    }
+    retrieveAllEntities(res,req.params.id,nrows);
 });
 
 app.get('/export/:id', (req,res)=>{
@@ -56,7 +63,12 @@ app.get('/export/:id', (req,res)=>{
 
 app.get('/visualize/:id', (req,res)=>{
   config = connect(users[req.params.id].connectionString);
-  getFirstEntity(res,req.params.id);
+  nrows=20;
+  if(req.query.noofrows != undefined) {
+    noofsegments=req.query.noofrows/segmentSize;
+    nrows=req.query.noofrows;
+  }
+  getFirstEntity(res,req.params.id,nrows);
 });
 
 app.post('/api/:id',urlencodedParser, (req,res)=>{
@@ -114,7 +126,7 @@ function connect(connectionString) {
 
 // Retrive All Entities
 
-function retrieveAllEntities(res,reqid) {
+function retrieveAllEntities(res,reqid,nrows) {
 
   // Reset
   data = [];
@@ -128,7 +140,7 @@ function retrieveAllEntities(res,reqid) {
 
 	if(error) console.log(error);
 	else {
-    res.render('table', {'data' : data, 'columns' : data[0], 'id' : reqid});
+    res.render('table', {'data' : data, 'columns' : data[0], 'id' : reqid, 'nrows' : nrows});
   }
   });
 }
@@ -158,7 +170,7 @@ function downloadEntities(res) {
 
 // Get First Entity
 
-function getFirstEntity(res,reqid) {
+function getFirstEntity(res,reqid,nrows) {
 
   // Reset
   data = [];
@@ -175,7 +187,7 @@ function getFirstEntity(res,reqid) {
   else {
     console.log("One Entity");
     console.log(data);
-    res.render('visualize', {'data' : data, 'columns' : data[0], 'id' : reqid, 'tablename' : users[reqid].accountName});
+    res.render('visualize', {'data' : data, 'columns' : data[0], 'id' : reqid, 'tablename' : users[reqid].accountName, 'nrows' : nrows});
   }
   });
 }
@@ -249,7 +261,7 @@ function retrieveAllEntitiesHelper(tableQuery, continuationToken, callback) {
 
     continuationToken = result.continuationToken;
     segments++;
-    if (continuationToken && segments<1) {
+    if (continuationToken && segments<noofsegments) {
       retrieveAllEntitiesHelper(tableQuery, continuationToken, callback);
     } else {
       console.log("Query completed.");
@@ -273,7 +285,7 @@ function getFirstEntityHelper(tableQuery, continuationToken, callback) {
 
     continuationToken = result.continuationToken;
     segments++;
-    if (continuationToken && segments<1) {
+    if (continuationToken && segments<noofsegments) {
       getFirstEntityHelper(tableQuery, continuationToken, callback);
     } else {
       console.log("Query completed.");

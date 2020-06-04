@@ -21,7 +21,30 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a onclick="plot('bar','<%= id %>', '<%= tablename %>')" style="opacity: 0.7;border-radius: 10px;" type="button" class="btn btn-dark ml-auto">Plot</a>
+      <select onchange="change(this.value, '<%= id %>')" style="background: transparent;color: white;width: 10%;" class="browser-default custom-select ml-auto">
+        <option selected>No of rows</option>
+        <% if(nrows == 20) {%>
+        <option value="20" selected>20</option>
+        <% }else{%>
+        <option value="20">20</option>
+        <% } %>
+        <% if(nrows == 100) {%>
+        <option value="100" selected>100</option>
+        <% }else{%>
+        <option value="100">100</option>
+        <% } %>
+        <% if(nrows == 500) {%>
+        <option value="500" selected>500</option>
+        <% }else{%>
+        <option value="500">500</option>
+        <% } %>
+        <% if(nrows == 1000) {%>
+        <option value="1000" selected>1000</option>
+        <% }else{%>
+        <option value="1000">1000</option>
+        <% } %>
+      </select>
+      <a onclick="plot('bar','<%= id %>', '<%= tablename %>')" style="opacity: 0.7;border-radius: 10px;" type="button" class="btn btn-dark">Plot</a>
     </nav>
     <div class="mt-3 col-md-4 offset-md-4 text-center">
         <nav class="nav nav-pills flex-column flex-sm-row">
@@ -49,6 +72,12 @@
         </div>
         <div class="col-md-9">
           <canvas id="chart"></canvas>
+          <div class="mt-3 card col-md-3 offset-md-4">
+            <div class="card-body">
+              <h6><span><strong>X-Axis : </strong></span><span id="xaxis"></span></h6>
+              <h6><span><strong>Y-Axis : </strong></span><span id="yaxis"></span></h6>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -69,6 +98,11 @@
 
 let columns = [];
 var myChart;
+
+function change(val,id) {
+  window.location="/visualize/"+id+"?noofrows="+val;
+}
+
 function handler(ele) {
     if(ele.checked==true) {
         columns.push(ele.id);
@@ -100,6 +134,8 @@ function plot(met,id, tablename) {
                     data.push(ele['col2']);
                 });
                 chartHelper(labels, data, met, tablename);
+                document.getElementById('xaxis').innerText = columns[0];
+                document.getElementById('yaxis').innerText = columns[1];
             }
         });
     }
