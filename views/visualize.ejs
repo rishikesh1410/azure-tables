@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/css/mdb.min.css" rel="stylesheet">
+    <title>Welcome to Data-Lab</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+      <a class="navbar-brand" href="/">Azure Tables</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a onclick="plot('bar','<%= id %>', '<%= tablename %>')" style="opacity: 0.7;border-radius: 10px;" type="button" class="btn btn-dark ml-auto">Plot</a>
+    </nav>
+    <div class="mt-3 col-md-4 offset-md-4 text-center">
+        <nav class="nav nav-pills flex-column flex-sm-row">
+          <a class="flex-sm-fill text-sm-center active" href="/">Business</a>
+          <a class="flex-sm-fill text-sm-center" href="/afteam">AF Team</a>
+        </nav>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+           <div class="mt-3 card" style="overflow-x:scroll;">
+            <div class="card-body">
+              <h5 class="card-title">Columns</h5>
+              <ul class="list-group" style="background: transparent;">
+                <% for(var column in columns) { if(column != '.metadata') {%>
+                <li style="background: transparent;" class="list-group-item"><label for="<%= column %>"><%= column %></label><span>
+                  <input onchange="handler(this)" style="float: right;" type="checkbox" id="<%= column %>" name="">
+                </span>
+              </li>
+                <% } } %>
+                
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-9">
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+    </div>
+   
+
+</body>
+<!-- JQuery -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+
+let columns = [];
+var myChart;
+function handler(ele) {
+    if(ele.checked==true) {
+        columns.push(ele.id);
+        console.log(columns);
+    }else {
+        let ind = columns.indexOf(ele.id);
+        if(ind>-1) {
+            columns.splice(ind,1);
+        }
+        console.log(columns);
+    }
+}
+function plot(met,id, tablename) {
+    if(columns.length > 1) {
+        let col1 = columns[0];
+        let col2 = columns[1];
+
+        $.ajax({
+            type: "POST",
+            url: '/api/'+id,
+            data: {col1:col1,col2:col2},
+            success: function(res) {
+                res = JSON.parse(res);
+                console.log(res);
+                let labels = [];
+                let data = [];
+                res.forEach(ele => {
+                    labels.push(ele['col1']);
+                    data.push(ele['col2']);
+                });
+                chartHelper(labels, data, met, tablename);
+            }
+        });
+    }
+}
+function chartHelper(labels, data, met, tablename) {
+    if(met == "bar") barChart(labels, data, tablename);
+    else if(met == "line") lineChart(labels, data);
+    else if(met == "pie") pieChart(labels, data);
+    
+}
+
+// PLOTS
+Chart.defaults.global.defaultFontColor = 'white';
+function barChart(labels,data,tablename) {
+    var ctx = document.getElementById('chart').getContext('2d');
+    if (window.myChart!=undefined) {
+        window.myChart.destroy();
+    }
+    window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,//aray
+            datasets: [{
+                label: tablename,
+                data: data,//array
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                borderColor: 'rgba(200, 200, 200, 1)',
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            resposive:true,
+            maintainAspectRatio: true
+        },
+    });
+}
+
+function lineChart(labels,data) {
+    var ctx = document.getElementById('chart').getContext('2d');
+    if (window.myChart!=undefined) {
+        window.myChart.destroy();
+    }
+    window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,//aray
+            datasets: [{
+                label: 'Iris Dataset',
+                data: data,//array
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            resposive:true,
+            maintainAspectRatio: true
+        }
+    });
+}
+
+function pieChart(labels,data) {
+    var ctx = document.getElementById('chart').getContext('2d');
+    if (window.myChart!=undefined) {
+        window.myChart.destroy();
+    }
+    window.myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,//aray
+            datasets: [{
+                label: 'Iris Dataset',
+                data: data,//array
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            resposive:true,
+            maintainAspectRatio: true
+        }
+    });
+}
+</script>
+
+</html>

@@ -1,0 +1,26 @@
+.mynavbar{
+	background : transparent;
+	color : white;
+}
+body{
+	background-color: rgb(0,0,0,0.7);
+	color : white;
+}
+a{
+	color: white;
+	background: transparent;
+	padding : 10px;
+}
+a:hover{
+	text-decoration: none;
+	color: white;
+}
+.card{
+	background: transparent;
+	color: white;
+}
+.active {
+	background-color: rgb(0,0,0,0.5);
+	padding : 10px;
+	border-radius : 10px;
+}

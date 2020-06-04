@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/css/mdb.min.css" rel="stylesheet">
+    <title>Welcome to Data-Lab</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg mynavbar">
+      <a class="navbar-brand" href="#">Azure Tables</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
+    <div class="mt-3 col-md-4 offset-md-4 text-center">
+        <nav class="nav nav-pills flex-column flex-sm-row mynavbar">
+          <a class="flex-sm-fill text-sm-center active" href="/">Business</a>
+          <a class="flex-sm-fill text-sm-center" href="/afteam">AF Team</a>
+        </nav>
+        <div class="mt-3 card">
+          <div class="card-body">
+            <h5 class="card-title">Accounts</h5>
+            <form action="/join" method="POST">
+              <ul class="list-group">
+                <% for(var x in users){ %>
+                  <li style="background: transparent;" class="list-group-item"><a class="" href="/account/<%= x %>"><%= users[x].accountName %>
+                  </a>
+                  <span>
+                    <input onchange="handler(this)" style="float: right;" type="checkbox" name="<%= x %>">
+                  </span>
+                </li>
+               <% } %>
+              </ul><br>
+              <button style="opacity: 0.7;border-radius: 10px;" type="submit" class="btn btn-dark">Join Tables</button>
+            </form>
+          </div>
+        </div>
+    </div>
+
+</body>
+<!-- JQuery -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/js/mdb.min.js"></script>
+</html>
